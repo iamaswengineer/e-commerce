@@ -6,7 +6,7 @@ This project simulates the simple behaviours of a shopping cart. Set of discount
 
 TODO: Application configuration can be changed via `application.properties` file which has been located under the<br/>`e-commerce/src/main/resources/application.properties`.
 
-TODO: Application uses constant configurable values in order to calculate delivery costs. These values can also be configured via `application.properties` file.
+TODO: Application uses constant configurable values in order to calculate the delivery cost of shopping cart. These values can also be configured via `application.properties` file.
 
 ## Usage
 
