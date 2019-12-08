@@ -13,8 +13,8 @@ import java.util.Set;
 public class DiscountDecoratorDTO {
     private Map<Long, Set<ShoppingCartDetailServiceDTO>> detailMapByCategory;
     private Map<ShoppingCartDetailServiceDTO, Long> quantityMapByDetail;
-    private Double totalCartPrice = 0.0; //serviste setleniyor.
+    private Double totalCartPrice = 0.0;
     private Double cartPriceAfterDiscount = 0.0;
-    private Double couponDiscountAmount = 0.0; // her bir child discount kendi setliyor.
-    private Double campaignDiscountAmount = 0.0;// her bir child discount kendi setliyor.
+    private Double couponDiscountAmount = 0.0;
+    private Double campaignDiscountAmount = 0.0;
 }

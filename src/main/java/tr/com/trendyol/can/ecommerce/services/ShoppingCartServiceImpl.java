@@ -53,12 +53,13 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         DiscountDecoratorDTO discountDecoratorDTO;
         Product product = productRepository.findBy(shoppingCartDTO.getProductId());
         User user = userRepository.findUserById(shoppingCartDTO.getUserId());
+        shoppingCartCache.updateTotalCartPriceOfUser(user.getId(), product.getPrice() * shoppingCartDTO.getQuantity());
         ShoppingCart shoppingCart = shoppingCartRepository.findShoppingCartByUserId(shoppingCartDTO.getUserId());
         List<ShoppingCartDetailServiceDTO> detailListOfUser = shoppingCartCache.findByUserId(shoppingCartDTO.getUserId());
         if (CartUtils.isProductExist(shoppingCartDTO.getProductId(), detailListOfUser)) {
             ShoppingCartDetailServiceDTO detail = CartUtils.incrementQuantityIfSameProductExist(shoppingCartDTO.getProductId(), shoppingCartDTO.getQuantity(), detailListOfUser);
             cacheUpdate(user, detailListOfUser);
-            discountDecoratorDTO = applyDiscount(detail);
+            discountDecoratorDTO = applyDiscount(user);
             ShoppingCart _shoppingCart = CartUtils.mapToShoppingCart(user, shoppingCart, discountDecoratorDTO);
             for (ShoppingCartDetail shoppingCartDetail : _shoppingCart.getShoppingCartDetailList()) {
                 if (shoppingCartDetail.getProduct().getId().equals(shoppingCartDTO.getProductId())) {
@@ -75,7 +76,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
             detailListOfUser.add(shoppingCartDetailServiceDTO);
             cacheUpdate(user, detailListOfUser);
 
-            discountDecoratorDTO = applyDiscount(shoppingCartDetailServiceDTO);
+            discountDecoratorDTO = applyDiscount(user);
 
             ShoppingCartDetail shoppingCartDetail = CartUtils.mapToShoppingCartDetail(shoppingCartDetailServiceDTO, product);
             ShoppingCart _shoppingCart = CartUtils.mapToShoppingCart(user, discountDecoratorDTO, shoppingCart, shoppingCartDetail);
@@ -123,11 +124,11 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         shoppingCartCache.constructByShoppingCartDetailQuantityMap(user.getId());
     }
 
-    private DiscountDecoratorDTO applyDiscount(ShoppingCartDetailServiceDTO shoppingCartDetailServiceDTO) {
+    private DiscountDecoratorDTO applyDiscount(User user) {
         DiscountDecoratorDTO discountDecoratorDTO = new DiscountDecoratorDTO();
         discountDecoratorDTO.setDetailMapByCategory(shoppingCartCache.getDetailMapByCategory());
         discountDecoratorDTO.setQuantityMapByDetail(shoppingCartCache.getQuantityMapByDetail());
-        discountDecoratorDTO.setTotalCartPrice(shoppingCartDetailServiceDTO.getTotalPrice());
+        discountDecoratorDTO.setTotalCartPrice(shoppingCartCache.getTotalCartPriceMapByUser().get(user.getId()));
         discountDecoratorDTO = discountManager.apply(discountDecoratorDTO);
         discountDecoratorDTO.setCartPriceAfterDiscount(discountDecoratorDTO.getTotalCartPrice() - (discountDecoratorDTO.getCampaignDiscountAmount() + discountDecoratorDTO.getCouponDiscountAmount()));
         return discountDecoratorDTO;

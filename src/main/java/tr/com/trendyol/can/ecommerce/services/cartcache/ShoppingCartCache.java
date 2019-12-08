@@ -5,6 +5,7 @@ import lombok.Setter;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
+import tr.com.trendyol.can.ecommerce.entities.User;
 import tr.com.trendyol.can.ecommerce.services.dto.DiscountDecoratorDTO;
 import tr.com.trendyol.can.ecommerce.services.dto.ShoppingCartDetailServiceDTO;
 
@@ -15,6 +16,9 @@ import java.util.*;
 public class ShoppingCartCache {
 
     private Map<Long, List<ShoppingCartDetailServiceDTO>> cache = new HashMap<>();
+
+    @Getter
+    private Map<Long, Double> totalCartPriceMapByUser = new HashMap<>();
 
     @Getter
     private Map<Long, Set<ShoppingCartDetailServiceDTO>> detailMapByCategory = new HashMap<>();
@@ -63,6 +67,18 @@ public class ShoppingCartCache {
             }else{
                 detailMapByCategory.get(userId).add(shoppingCartDetail);
             }
+        }
+    }
+
+    public void updateTotalCartPriceOfUser(User user, Double totalItemPrice) {
+        if (totalCartPriceMapByUser.size() == 0) {
+            totalCartPriceMapByUser.put(user.getId(), totalItemPrice);
+        } else if (totalCartPriceMapByUser.get(user.getId()) != null) {
+            Double price = totalCartPriceMapByUser.get(user.getId());
+            price = price + totalItemPrice;
+            totalCartPriceMapByUser.put(user.getId(), price);
+        } else {
+            totalCartPriceMapByUser.put(user.getId(), totalItemPrice);
         }
     }
 }
