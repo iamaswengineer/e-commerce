@@ -53,27 +53,30 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         DiscountDecoratorDTO discountDecoratorDTO;
         Product product = productRepository.findBy(shoppingCartDTO.getProductId());
         User user = userRepository.findUserById(shoppingCartDTO.getUserId());
-        shoppingCartCache.updateTotalCartPriceOfUser(user.getId(), product.getPrice() * shoppingCartDTO.getQuantity());
+        shoppingCartCache.updateTotalCartPriceOfUser(user, product.getPrice() * shoppingCartDTO.getQuantity());
         ShoppingCart shoppingCart = shoppingCartRepository.findShoppingCartByUserId(shoppingCartDTO.getUserId());
         List<ShoppingCartDetailServiceDTO> detailListOfUser = shoppingCartCache.findByUserId(shoppingCartDTO.getUserId());
-        if (CartUtils.isProductExist(shoppingCartDTO.getProductId(), detailListOfUser)) {
-            ShoppingCartDetailServiceDTO detail = CartUtils.incrementQuantityIfSameProductExist(shoppingCartDTO.getProductId(), shoppingCartDTO.getQuantity(), detailListOfUser);
-            cacheUpdate(user, detailListOfUser);
+        ShoppingCartDetailServiceDTO shoppingCartDetailServiceDTO = CartUtils.returnExistingItem(shoppingCartDTO.getProductId(), detailListOfUser);
+
+        if (shoppingCartDetailServiceDTO != null) {
+
+            shoppingCartDetailServiceDTO.incrementQuantity(shoppingCartDTO.getQuantity());
+            shoppingCartDetailServiceDTO.setTotalPrice(shoppingCartDetailServiceDTO.getPrice() * shoppingCartDetailServiceDTO.getQuantity());
+
             discountDecoratorDTO = applyDiscount(user);
             ShoppingCart _shoppingCart = CartUtils.mapToShoppingCart(user, shoppingCart, discountDecoratorDTO);
             for (ShoppingCartDetail shoppingCartDetail : _shoppingCart.getShoppingCartDetailList()) {
-                if (shoppingCartDetail.getProduct().getId().equals(shoppingCartDTO.getProductId())) {
-                    shoppingCartDetail.setQuantity(shoppingCartDetail.getQuantity() + shoppingCartDTO.getQuantity());
+                if (shoppingCartDetail.getProduct().getId().equals(shoppingCartDetailServiceDTO.getProductId())) {
+                    shoppingCartDetail.setQuantity(shoppingCartDetailServiceDTO.getQuantity());
                 }
             }
             shoppingCartRepository.save(_shoppingCart);
         } else {
-            ShoppingCartDetailServiceDTO shoppingCartDetailServiceDTO = CartUtils.mapToShoppingCartDetailServiceDTO(shoppingCartDTO);
+            shoppingCartDetailServiceDTO = CartUtils.mapToShoppingCartDetailServiceDTO(shoppingCartDTO);
             shoppingCartDetailServiceDTO.setCategoryId(product.getCategory().getId());
             shoppingCartDetailServiceDTO.setPrice(product.getPrice());
             shoppingCartDetailServiceDTO.setTotalPrice(shoppingCartDetailServiceDTO.getPrice() * shoppingCartDetailServiceDTO.getQuantity());
 
-            detailListOfUser.add(shoppingCartDetailServiceDTO);
             cacheUpdate(user, detailListOfUser);
 
             discountDecoratorDTO = applyDiscount(user);

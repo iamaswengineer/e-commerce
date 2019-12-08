@@ -8,33 +8,21 @@ import tr.com.trendyol.can.ecommerce.entities.User;
 import tr.com.trendyol.can.ecommerce.services.dto.DiscountDecoratorDTO;
 import tr.com.trendyol.can.ecommerce.services.dto.ShoppingCartDetailServiceDTO;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class CartUtils {
 
-    public static ShoppingCartDetailServiceDTO incrementQuantityIfSameProductExist(Long productId, Long quantity, List<ShoppingCartDetailServiceDTO> shoppingCartDetailServiceDTOList) {
+    public static ShoppingCartDetailServiceDTO returnExistingItem(Long productId, List<ShoppingCartDetailServiceDTO> shoppingCartDetailServiceDTOList) {
+        if(shoppingCartDetailServiceDTOList.size() == 0){
+            return null;
+        }
+
         for(ShoppingCartDetailServiceDTO shoppingCartDetailServiceDTO : shoppingCartDetailServiceDTOList){
             if(shoppingCartDetailServiceDTO.getProductId().equals(productId)){
-                shoppingCartDetailServiceDTO.incrementQuantity(quantity);
                 return shoppingCartDetailServiceDTO;
             }
         }
         return null;
-    }
-
-    public static boolean isProductExist(Long productId, List<ShoppingCartDetailServiceDTO> shoppingCartDetailServiceDTOList) {
-        if(shoppingCartDetailServiceDTOList.size() == 0){
-            return false;
-        }
-        for(ShoppingCartDetailServiceDTO shoppingCartDetailServiceDTO : shoppingCartDetailServiceDTOList){
-            if(shoppingCartDetailServiceDTO.getProductId().equals(productId)){
-                return true;
-            }
-        }
-        return false;
     }
 
     public static ShoppingCart mapToShoppingCart(User user, ShoppingCart shoppingCart, DiscountDecoratorDTO discountDecoratorDTO){
