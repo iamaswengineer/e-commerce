@@ -9,7 +9,7 @@ import tr.com.trendyol.can.ecommerce.services.dto.ShoppingCartDetailServiceDTO;
 import java.util.Map;
 
 
-class DiscountCouponRateOf10 extends ConcreteDiscountDecorator{
+class DiscountCouponRateOf10 extends ConcreteDiscountDecorator {
 
     private Double minimumPurchaseAmount = 100.0;
     private DiscountCalculator discountCalculator;
@@ -22,18 +22,16 @@ class DiscountCouponRateOf10 extends ConcreteDiscountDecorator{
     @Override
     public DiscountDecoratorDTO apply(DiscountDecoratorDTO decoratable) {
         DiscountDecoratorDTO decorated = super.apply(decoratable);
-        for(Map.Entry<ShoppingCartDetailServiceDTO, Long> entry : decorated.getQuantityMapByDetail().entrySet()){
-            if(decoratable.getTotalCartPrice() - decoratable.getCampaignDiscountAmount() > minimumPurchaseAmount){
-                DiscountServiceDTO d =
-                        new DiscountServiceDTO(
-                                entry.getKey().getCategoryId(),
-                                10.0,
-                                DiscountStrategy.RATE.getValue());
-                Double calculated = discountCalculator.calculateCouponDiscount(d, decoratable);
-                decoratable.setCouponDiscountAmount(decoratable.getCouponDiscountAmount() + calculated);
-                return decoratable;
-            }
+        if (decoratable.getTotalCartPrice() - decorated.getCampaignDiscountAmount() > minimumPurchaseAmount) {
+            DiscountServiceDTO d =
+                    new DiscountServiceDTO(
+                            10.0,
+                            DiscountStrategy.RATE.getValue());
+            Double calculated = discountCalculator.calculateCouponDiscount(d, decoratable);
+            decoratable.setCouponDiscountAmount(decoratable.getCouponDiscountAmount() + calculated);
+
         }
+
         return decoratable;
     }
 }

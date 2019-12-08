@@ -19,8 +19,7 @@ public class DiscountServiceDTO {
         this.discountStrategy = discountStrategy;
     }
 
-    public DiscountServiceDTO(Long categoryId, Double amount, Long discountStrategy) {
-        this.categoryId = categoryId;
+    public DiscountServiceDTO(Double amount, Long discountStrategy) {
         this.amount = amount;
         this.discountStrategy = discountStrategy;
     }

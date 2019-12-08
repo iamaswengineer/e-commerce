@@ -3,16 +3,13 @@ package tr.com.trendyol.can.ecommerce.services.dto;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Getter
 @Setter
 public class DiscountDecoratorDTO {
-    private Map<Long, Set<ShoppingCartDetailServiceDTO>> detailMapByCategory;
-    private Map<ShoppingCartDetailServiceDTO, Long> quantityMapByDetail;
+    private Map<Long, List<ShoppingCartDetailServiceDTO>> detailMapByCategory;
+    private Stack<ShoppingCartDetailServiceDTO> shopingCartDetails;
     private Double totalCartPrice = 0.0;
     private Double cartPriceAfterDiscount = 0.0;
     private Double couponDiscountAmount = 0.0;

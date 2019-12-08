@@ -9,8 +9,8 @@ import tr.com.trendyol.can.ecommerce.services.dto.ShoppingCartDetailServiceDTO;
 
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 class DiscountRateOf50 implements DiscountDecorator {
 
@@ -22,7 +22,7 @@ class DiscountRateOf50 implements DiscountDecorator {
 
     @Override
     public DiscountDecoratorDTO apply(DiscountDecoratorDTO decoratable) {
-        for(Map.Entry<Long, Set<ShoppingCartDetailServiceDTO>> entry : decoratable.getDetailMapByCategory().entrySet()){
+        for (Map.Entry<Long, List<ShoppingCartDetailServiceDTO>> entry : decoratable.getDetailMapByCategory().entrySet()) {
             if (entry.getValue().size() > 5) {
                 DiscountServiceDTO d =
                         new DiscountServiceDTO(
@@ -33,7 +33,6 @@ class DiscountRateOf50 implements DiscountDecorator {
 
                 Double calculated = discountCalculator.calculate(d, entry.getValue());
                 decoratable.setCampaignDiscountAmount(calculated);
-                return decoratable;
             }
         }
         return decoratable;

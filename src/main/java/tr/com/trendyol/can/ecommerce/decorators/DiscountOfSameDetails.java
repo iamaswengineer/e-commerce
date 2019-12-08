@@ -6,7 +6,6 @@ import tr.com.trendyol.can.ecommerce.services.dto.DiscountDecoratorDTO;
 import tr.com.trendyol.can.ecommerce.services.dto.DiscountServiceDTO;
 import tr.com.trendyol.can.ecommerce.services.dto.ShoppingCartDetailServiceDTO;
 
-import java.util.Map;
 
 class DiscountOfSameDetails extends ConcreteDiscountDecorator {
 
@@ -20,19 +19,18 @@ class DiscountOfSameDetails extends ConcreteDiscountDecorator {
     @Override
     public DiscountDecoratorDTO apply(DiscountDecoratorDTO decoratable) {
         DiscountDecoratorDTO decorated = super.apply(decoratable);
-        for (Map.Entry<ShoppingCartDetailServiceDTO, Long> entry : decorated.getQuantityMapByDetail().entrySet()) {
-            if (entry.getValue() > 1) {
+        for (ShoppingCartDetailServiceDTO detail : decorated.getShopingCartDetails()) {
+            if (detail.getQuantity() > 1) {
                 DiscountServiceDTO d =
                         new DiscountServiceDTO(
-                                entry.getKey().getCategoryId(),
+                                detail.getCategoryId(),
                                 5.0,
-                                entry.getValue(),
+                                detail.getQuantity(),
                                 DiscountStrategy.AMOUNT.getValue()
                         );
 
-                Double calculated = discountCalculatorForSameItems.calculate(d, entry.getKey());
+                Double calculated = discountCalculatorForSameItems.calculate(d, detail);
                 decoratable.setCampaignDiscountAmount(decoratable.getCampaignDiscountAmount() + calculated);
-                return decoratable;
             }
         }
         return decoratable;

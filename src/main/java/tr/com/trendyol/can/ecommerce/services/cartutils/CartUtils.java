@@ -12,12 +12,12 @@ import java.util.*;
 
 public class CartUtils {
 
-    public static ShoppingCartDetailServiceDTO returnExistingItem(Long productId, List<ShoppingCartDetailServiceDTO> shoppingCartDetailServiceDTOList) {
-        if(shoppingCartDetailServiceDTOList.size() == 0){
+    public static ShoppingCartDetailServiceDTO returnExistingItem(Long productId, Stack<ShoppingCartDetailServiceDTO> detailStack) {
+        if(detailStack.size() == 0){
             return null;
         }
 
-        for(ShoppingCartDetailServiceDTO shoppingCartDetailServiceDTO : shoppingCartDetailServiceDTOList){
+        for(ShoppingCartDetailServiceDTO shoppingCartDetailServiceDTO : detailStack){
             if(shoppingCartDetailServiceDTO.getProductId().equals(productId)){
                 return shoppingCartDetailServiceDTO;
             }
@@ -25,13 +25,12 @@ public class CartUtils {
         return null;
     }
 
-    public static ShoppingCart mapToShoppingCart(User user, ShoppingCart shoppingCart, DiscountDecoratorDTO discountDecoratorDTO){
-        shoppingCart.setCouponDiscountAmount(shoppingCart.getCouponDiscountAmount() != null ? shoppingCart.getCouponDiscountAmount() + discountDecoratorDTO.getCouponDiscountAmount() : discountDecoratorDTO.getCouponDiscountAmount());
+    public static void mapToShoppingCart(User user, ShoppingCart shoppingCart, DiscountDecoratorDTO discountDecoratorDTO){
+        shoppingCart.setCouponDiscountAmount(discountDecoratorDTO.getCouponDiscountAmount());
         shoppingCart.setCampaignDiscountAmount(shoppingCart.getCampaignDiscountAmount() != null ? shoppingCart.getCampaignDiscountAmount() + discountDecoratorDTO.getCampaignDiscountAmount() : discountDecoratorDTO.getCampaignDiscountAmount());
-        shoppingCart.setTotalCartPrice(shoppingCart.getTotalCartPrice() != null ? shoppingCart.getTotalCartPrice() + discountDecoratorDTO.getTotalCartPrice() : discountDecoratorDTO.getTotalCartPrice());
+        shoppingCart.setTotalCartPrice(discountDecoratorDTO.getTotalCartPrice());
         shoppingCart.setCartPriceAfterDiscount(shoppingCart.getTotalCartPrice() - (shoppingCart.getCouponDiscountAmount() + shoppingCart.getCampaignDiscountAmount()));
         shoppingCart.setUser(user);
-        return shoppingCart;
     }
 
     public static ShoppingCartDetailServiceDTO mapToShoppingCartDetailServiceDTO(ShoppingCartDTO shoppingCartDTO){
@@ -47,19 +46,5 @@ public class CartUtils {
         shoppingCartDetail.setTotalPrice(shoppingCartDetailServiceDTO.getTotalPrice());
         shoppingCartDetail.setProduct(product);
         return shoppingCartDetail;
-    }
-
-    public static ShoppingCart mapToShoppingCart(User user, DiscountDecoratorDTO discountDecoratorDTO, ShoppingCart shoppingCart, ShoppingCartDetail shoppingCartDetail){
-        if(shoppingCart == null){
-            shoppingCart = new ShoppingCart();
-        }
-        shoppingCart.setUser(user);
-        shoppingCart.getShoppingCartDetailList().add(shoppingCartDetail);
-        shoppingCart.setTotalCartPrice(shoppingCart.getTotalCartPrice() != null ? shoppingCart.getTotalCartPrice() + discountDecoratorDTO.getTotalCartPrice() : discountDecoratorDTO.getTotalCartPrice());
-        shoppingCart.setCampaignDiscountAmount(shoppingCart.getCampaignDiscountAmount() != null ? shoppingCart.getCampaignDiscountAmount() + discountDecoratorDTO.getCampaignDiscountAmount() : discountDecoratorDTO.getCampaignDiscountAmount());
-        shoppingCart.setCouponDiscountAmount(shoppingCart.getCouponDiscountAmount() != null ? shoppingCart.getCouponDiscountAmount() + discountDecoratorDTO.getCouponDiscountAmount() : discountDecoratorDTO.getCouponDiscountAmount());
-        shoppingCart.setCartPriceAfterDiscount(shoppingCart.getTotalCartPrice() - (shoppingCart.getCouponDiscountAmount() + shoppingCart.getCampaignDiscountAmount()));
-
-        return shoppingCart;
     }
 }
